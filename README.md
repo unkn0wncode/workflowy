@@ -80,12 +80,13 @@ for i, node := range nodes {
 }
 ```
 
-- Create a child node at the bottom
+- Create a child node at the bottom with specific layout mode
 ```go
 childID, err := c.CreateNode(ctx, workflowy.Create{
-    ParentID: parentID,
-    Name:     "Child",
-    Position: &workflowy.PositionBottom,
+    ParentID:   parentID,
+    Name:       "Child node",
+    Position:   &workflowy.PositionBottom,
+    LayoutMode: &workflowy.LayoutModeTodo,
 })
 ```
 
@@ -104,17 +105,6 @@ _ = c.UncompleteNode(ctx, nodeID)
 - Delete a node
 ```go
 err := c.DeleteNode(ctx, nodeID)
-```
-
-- Set a custom base URL (defaults to workflowy.BaseURL)
-```go
-c.SetBaseURL("https://workflowy.com/api/v1")
-```
-
-- Use a layout mode
-```go
-mode := workflowy.LayoutModeTodo
-_, err := c.CreateNode(ctx, workflowy.Create{Name: "Todo Item", LayoutMode: &mode})
 ```
 
 ## Notes
