@@ -29,6 +29,7 @@ Methods for API calls:
 - `DeleteNode` - delete a node by ID
 - `CompleteNode` - complete a node by ID
 - `UncompleteNode` - uncomplete a node by ID
+- `ListTargets` - list all existing targets, returns `[]*Target` (system targets may be returned even if the target node hasn't been created yet)
 
 The `Client` also handles 429 Too Many Requests error, since the API documentation does not provide rate limits. It retries up to 3 times, following directions in "Retry-After" header and respecting `Context` expiration.
 
@@ -111,6 +112,17 @@ _ = c.UncompleteNode(ctx, nodeID)
 - Delete a node
 ```go
 err := c.DeleteNode(ctx, nodeID)
+```
+
+- List all existing targets
+```go
+targets, err := c.ListTargets(ctx)
+if err != nil {
+    log.Fatal(err)
+}
+for _, target := range targets {
+    fmt.Printf("Target: %+v\n", target)
+}
 ```
 
 ## Notes

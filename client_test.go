@@ -188,3 +188,13 @@ func TestFullCycle(t *testing.T) {
 	require.Nil(t, deletedTarget)
 	t.Logf("deleted move target node %s", moveTargetID)
 }
+
+// TestListTargets tests the ListTargets function.
+func TestListTargets(t *testing.T) {
+	c := NewClient(testToken)
+	ctx := t.Context()
+	targets, err := c.ListTargets(ctx)
+	require.NoError(t, err)
+	require.NotEmpty(t, targets)
+	t.Logf("listed targets: %d", len(targets))
+}

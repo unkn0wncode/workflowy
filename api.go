@@ -35,7 +35,7 @@ type Update struct {
 
 // Move is the input to MoveNode.
 type Move struct {
-	ParentID string   `json:"parent_id"`
+	ParentID string    `json:"parent_id"`          // node ID or target key
 	Position *Position `json:"position,omitempty"` // defaults to "top" if not provided
 }
 
@@ -190,4 +190,19 @@ func (c *Client) UncompleteNode(ctx context.Context, nodeID string) error {
 		return fmt.Errorf("unexpected status: %s", status.Status)
 	}
 	return nil
+}
+
+// ListTargets returns a list of targets.
+func (c *Client) ListTargets(ctx context.Context) ([]*Target, error) {
+	req, err := c.newRequest(ctx, http.MethodGet, "/targets", nil)
+	if err != nil {
+		return nil, err
+	}
+	var out struct {
+		Targets []*Target `json:"targets"`
+	}
+	if err := c.do(req, &out); err != nil {
+		return nil, err
+	}
+	return out.Targets, nil
 }
