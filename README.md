@@ -25,6 +25,7 @@ Methods for API calls:
 - `GetNode` - get a node by ID, returns a `*Node` struct
 - `ListNodes` - list nodes under a parent (or root), returns `[]*Node`
 - `UpdateNode` - update a node, pass parameters in `Update` struct
+- `MoveNode` - move a node to a new parent, pass parameters in `Move` struct
 - `DeleteNode` - delete a node by ID
 - `CompleteNode` - complete a node by ID
 - `UncompleteNode` - uncomplete a node by ID
@@ -94,6 +95,11 @@ childID, err := c.CreateNode(ctx, workflowy.Create{
 ```go
 newName := "Updated"
 err := c.UpdateNode(ctx, nodeID, workflowy.Update{Name: &newName})
+```
+
+- Move a node to a new parent
+```go
+err := c.MoveNode(ctx, nodeID, workflowy.Move{ParentID: parentID, Position: &workflowy.PositionBottom})
 ```
 
 - Complete and uncomplete

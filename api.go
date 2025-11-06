@@ -33,6 +33,12 @@ type Update struct {
 	LayoutMode *LayoutMode `json:"layoutMode,omitempty"`
 }
 
+// Move is the input to MoveNode.
+type Move struct {
+	ParentID string   `json:"parent_id"`
+	Position *Position `json:"position,omitempty"` // defaults to "top" if not provided
+}
+
 type statusResponse struct {
 	Status string `json:"status"`
 }
@@ -101,6 +107,28 @@ func (c *Client) UpdateNode(ctx context.Context, nodeID string, in Update) error
 		return fmt.Errorf("nodeID is required")
 	}
 	req, err := c.newRequest(ctx, http.MethodPost, "/nodes/"+url.PathEscape(nodeID), in)
+	if err != nil {
+		return err
+	}
+	var status statusResponse
+	if err := c.do(req, &status); err != nil {
+		return err
+	}
+	if status.Status != "ok" {
+		return fmt.Errorf("unexpected status: %s", status.Status)
+	}
+	return nil
+}
+
+// MoveNode moves a node to a new parent/target.
+func (c *Client) MoveNode(ctx context.Context, nodeID string, in Move) error {
+	if nodeID == "" {
+		return fmt.Errorf("nodeID is required")
+	}
+	if in.ParentID == "" {
+		return fmt.Errorf("parentID is required")
+	}
+	req, err := c.newRequest(ctx, http.MethodPost, "/nodes/"+url.PathEscape(nodeID)+"/move", in)
 	if err != nil {
 		return err
 	}

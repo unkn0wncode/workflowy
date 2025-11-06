@@ -55,6 +55,7 @@ func TestClient_SetHTTPClient(t *testing.T) {
 //   - getting,
 //   - listing,
 //   - updating,
+//   - moving,
 //   - completing,
 //   - uncompleting,
 //   - deleting a node.
@@ -106,6 +107,33 @@ func TestFullCycle(t *testing.T) {
 	require.Equal(t, childID, children[0].ID)
 	t.Logf("listed children: %d", len(children))
 
+	// Move the child node to a new parent
+	moveTargetName := "API Test Move Target"
+	moveTargetID, err := c.CreateNode(ctx, Create{
+		Name:     moveTargetName,
+		Position: &PositionBottom,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, moveTargetID)
+	t.Logf("created moveTargetID: %s", moveTargetID)
+
+	err = c.MoveNode(ctx, childID, Move{
+		ParentID: moveTargetID,
+		Position: &PositionTop,
+	})
+	require.NoError(t, err)
+
+	children, err = c.ListNodes(ctx, nodeID)
+	require.NoError(t, err)
+	require.Empty(t, children)
+	t.Logf("listed children after move: %d", len(children))
+
+	movedChildren, err := c.ListNodes(ctx, moveTargetID)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(movedChildren))
+	require.Equal(t, childID, movedChildren[0].ID)
+	t.Logf("listed moved child: %d", len(movedChildren))
+
 	// Update the node
 	name = fmt.Sprintf("%s %s", name, node.ID)
 	err = c.UpdateNode(ctx, nodeID, Update{
@@ -136,6 +164,14 @@ func TestFullCycle(t *testing.T) {
 	require.Equal(t, false, node.Completed)
 	t.Logf("uncompleted node: %+v", node)
 
+	// Delete the moved child node
+	err = c.DeleteNode(ctx, childID)
+	require.NoError(t, err)
+	deletedChild, err := c.GetNode(ctx, childID)
+	require.Error(t, err)
+	require.Nil(t, deletedChild)
+	t.Logf("deleted child node %s", childID)
+
 	// Delete the node
 	err = c.DeleteNode(ctx, nodeID)
 	require.NoError(t, err)
@@ -143,4 +179,12 @@ func TestFullCycle(t *testing.T) {
 	require.Error(t, err)
 	require.Nil(t, node)
 	t.Logf("deleted node %s", nodeID)
+
+	// Delete the move target node
+	err = c.DeleteNode(ctx, moveTargetID)
+	require.NoError(t, err)
+	deletedTarget, err := c.GetNode(ctx, moveTargetID)
+	require.Error(t, err)
+	require.Nil(t, deletedTarget)
+	t.Logf("deleted move target node %s", moveTargetID)
 }
