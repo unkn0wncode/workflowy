@@ -198,3 +198,13 @@ func TestListTargets(t *testing.T) {
 	require.NotEmpty(t, targets)
 	t.Logf("listed targets: %d", len(targets))
 }
+
+// TestExportAll tests the ExportAll function.
+func TestExportAll(t *testing.T) {
+	c := NewClient(testToken)
+	ctx := t.Context()
+	nodes, err := c.ExportAll(ctx)
+	require.NoError(t, err)
+	require.NotEmpty(t, nodes)
+	t.Logf("exported nodes: %d", len(nodes))
+}

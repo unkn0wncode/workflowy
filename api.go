@@ -206,3 +206,19 @@ func (c *Client) ListTargets(ctx context.Context) ([]*Target, error) {
 	}
 	return out.Targets, nil
 }
+
+// ExportAll returns all nodes as a flat list.
+// This request is rate limited to 1 per minute.
+func (c *Client) ExportAll(ctx context.Context) ([]*Node, error) {
+	req, err := c.newRequest(ctx, http.MethodGet, "/nodes-export", nil)
+	if err != nil {
+		return nil, err
+	}
+	var out struct {
+		Nodes []*Node `json:"nodes"`
+	}
+	if err := c.do(req, &out); err != nil {
+		return nil, err
+	}
+	return out.Nodes, nil
+}

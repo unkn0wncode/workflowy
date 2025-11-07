@@ -30,6 +30,7 @@ Methods for API calls:
 - `CompleteNode` - complete a node by ID
 - `UncompleteNode` - uncomplete a node by ID
 - `ListTargets` - list all existing targets, returns `[]*Target` (system targets may be returned even if the target node hasn't been created yet)
+- `ExportAll` - export all nodes as a flat list, returns `[]*Node` (this request is rate limited to 1 per minute)
 
 The `Client` also handles 429 Too Many Requests error, since the API documentation does not provide rate limits. It retries up to 3 times, following directions in "Retry-After" header and respecting `Context` expiration.
 
@@ -122,6 +123,17 @@ if err != nil {
 }
 for _, target := range targets {
     fmt.Printf("Target: %+v\n", target)
+}
+```
+
+- Export all nodes as a flat list
+```go
+nodes, err := c.ExportAll(ctx)
+if err != nil {
+    log.Fatal(err)
+}
+for _, node := range nodes {
+    fmt.Printf("Node: %+v\n", node)
 }
 ```
 
